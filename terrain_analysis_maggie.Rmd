@@ -68,12 +68,18 @@ st_write(NDpond, 'dataPPR/NDpond.shp', append = F)
 elevND <- get_elev_raster(NDpond, z = 13) %>%
   rast(.)
 
-#Visualize DEM
-mapview(elevND) + mapview(NDpond)
-
 #Save local version for whitebox to use
 writeRaster(elevND, 'dataPPR/elevND.tif', overwrite = T)
 ```
+
+These mapviews make my html huge. I just took screenshots instead, sorry! 
+```{r, eval=F}
+
+#Visualize DEM
+mapview(elevND) + mapview(NDpond)
+```
+![ND DEM](dataPPR/ND_DEM.png)
+
 
 Get flow accumulation using just the straight DEM. We won't
 hydrologically condition bc we know our landscape isn't hydrologically connected. Also let's try DInf, which uses a multiple-flow direction. (**Note: I compared dInf to d8 and they produce the same TWI in the end...**)
@@ -85,10 +91,14 @@ wbt_d_inf_flow_accumulation(input = "dataPPR/elevND.tif",
 #Read in fa
 faND <- rast('dataPPR/faND.tif') %>%
   log10(.)
+```
 
+```{r, eval=F}
 #visualize flow accumulation
 mapview(faND) + mapview(NDpond)
 ```
+![ND flow accumulation](dataPPR/ND_fa.png)
+
 
 Calculate TWI
 ```{r, warning=F, message=F}
@@ -105,10 +115,14 @@ wbt_wetness_index(sca = 'dataPPR/faND.tif',
 #Read in TWI and slope
 twiND <- rast('dataPPR/twiND.tif')
 slopeND <- rast('dataPPR/slopeND.tif')
+```
 
+```{r, eval=F}
 #Visualize TWI
 mapview(twiND) + mapview(NDpond)
 ```
+![ND TWI](dataPPR/ND_twi.png)
+
 
 ### Calculate TWI in IA
 Now run it back for an IA pond
@@ -147,9 +161,12 @@ wbt_wetness_index(sca = 'dataPPR/faIA.tif',
 #Read in TWI and slope
 twiIA <- rast('dataPPR/twiIA.tif')
 slopeIA <- rast('dataPPR/slopeIA.tif')
+```
 
+```{r eval=F}
 mapview(twiIA) + mapview(IApond)
 ```
+![IA TWI](dataPPR/IA_twi.png)
 
 ### Compare
 Print DEM resolutions, for context
@@ -250,10 +267,16 @@ wbt_elevation_above_stream(
     output = 'dataPPR/handND.tif'
 )
 
-# visualize
 handND <- rast('dataPPR/handND.tif')
-mapview(handND) + mapview(NDpond)
+```
 
+```{r eval=F}
+# visualize
+mapview(handND) + mapview(NDpond)
+```
+![ND HAND](dataPPR/ND_HAND.png)
+
+```{R}
 #### Iowa's turn ###
 # extract likely stream cells from fa
 wbt_extract_streams(
@@ -269,10 +292,15 @@ wbt_elevation_above_stream(
     output = 'dataPPR/handIA.tif'
 )
 
-# visualize
 handIA <- rast('dataPPR/handIA.tif')
+```
+
+```{r, eval=F}
+# visualize
 mapview(handIA) + mapview(IApond)
 ```
+![IA HAND](dataPPR/IA_HAND.png)
+
 A lot of ponds got converted to NA merp.
 
 Extract HAND to GT points and plot
@@ -299,5 +327,6 @@ bind_rows(wetGTND_wHAND, nonwetGTND_wHAND) %>%
   geom_boxplot() +
   labs(title="Iowa roi")
 ```
+
 Whoa that's super unexpected. ND looks super solid. Why is IA so weird??
 
